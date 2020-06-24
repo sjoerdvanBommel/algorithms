@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pathfinder/components/grid.dart';
-import 'package:pathfinder/enums/algorithm.dart';
+import 'package:pathfinder/components/side_menu.dart';
+import 'package:pathfinder/enums/pathfinding_algorithm.dart';
 import 'package:pathfinder/enums/cell_action.dart';
 import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   int start = 17, end = 87;
   Set<int> selectedIndexes = Set<int>();
   Set<int> walls = Set<int>();
-  Algorithm algorithm = Algorithm.dijkstra;
+  PathfindingAlgorithm algorithm = PathfindingAlgorithm.dijkstra;
   List<int> shortestPath;
   List<int> visitedIndexes;
   List<int> grid;
@@ -134,7 +135,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     YoutubePlayerController _controller = YoutubePlayerController(
-      initialVideoId: '_lHSawdgXpI',
+      initialVideoId: algorithm.tutorial,
       flags: YoutubePlayerFlags(
         autoPlay: true
       ),
@@ -142,7 +143,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pathfinder'),
+        title: Text('Pathfinding algorithms'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -370,36 +371,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                title: Text(
-                  'Pathfinding algorithms',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: Algorithm.values.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(Algorithm.values[index].label),
-                      onTap: () {
-                        setState(() {
-                          algorithm = Algorithm.values[index];
-                        });
-                        resetOnCalculate();
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+      drawer: SideMenu(
+        onTapMenuItem: (index) {
+          setState(() {
+            algorithm = PathfindingAlgorithm.values[index];
+          });
+          resetOnCalculate();
+          Navigator.pop(context);
+        }
       ),
     );
   }
