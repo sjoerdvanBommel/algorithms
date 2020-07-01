@@ -1,4 +1,4 @@
-import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
+import 'package:algorithms/pathfinders/weighted_algorithm.dart';
 
 class AstarAlgorithm extends WeightedAlgorithm {
   List<int> expectedDistances = new List<int>();

@@ -1,4 +1,4 @@
-import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
+import 'package:algorithms/pathfinders/weighted_algorithm.dart';
 
 class DepthFirstSearchAlgorithm extends WeightedAlgorithm {
   bool visitedEnd = false;

@@ -1,4 +1,4 @@
-package com.example.pathfinder
+package com.sjoerdvanbommel.algorithms
 
 import io.flutter.embedding.android.FlutterActivity
 

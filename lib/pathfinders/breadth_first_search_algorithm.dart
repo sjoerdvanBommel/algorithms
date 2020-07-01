@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
+import 'package:algorithms/pathfinders/weighted_algorithm.dart';
 
 class BreadthFirstSearchAlgorithm extends WeightedAlgorithm {
   BreadthFirstSearchAlgorithm(Set<int> walls, int nColumns, int nRows, int start, int end)

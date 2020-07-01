@@ -1,149 +1,44 @@
 import 'dart:async';
 
+import 'package:algorithms/components/grid.dart';
+import 'package:algorithms/enums/cell_action.dart';
+import 'package:algorithms/enums/pathfinding_algorithm.dart';
+import 'package:algorithms/pathfinders/weighted_algorithm.dart';
 import 'package:flutter/material.dart';
-import 'package:pathfinder/components/grid.dart';
-import 'package:pathfinder/components/side_menu.dart';
-import 'package:pathfinder/enums/pathfinding_algorithm.dart';
-import 'package:pathfinder/enums/cell_action.dart';
-import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class HomePage extends StatefulWidget {
+class PathfindingTryPage extends StatefulWidget {
+  static const routeName = '/pathfinding/try';
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _PathfindingTryPageState createState() => _PathfindingTryPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final int nColumns = 10, nRows = 10;
+class _PathfindingTryPageState extends State<PathfindingTryPage> {
   final List<CellAction> cellActions = CellAction.values;
+  double speed = 5;
+  List<int> shortestPath, visitedIndexes, grid;
+  bool clickedCalculate = false;
+  int timeElapsed, shortestDistance, start = 17, end = 87, nColumns = 10, nRows = 10;
+  List<StreamSubscription> subscriptions = List<StreamSubscription>();
+  bool unsolvable = false;
   List<bool> isSelected = List.filled(CellAction.values.length, false);
-  int start = 17, end = 87;
   Set<int> selectedIndexes = Set<int>();
   Set<int> walls = Set<int>();
-  PathfindingAlgorithm algorithm = PathfindingAlgorithm.dijkstra;
-  List<int> shortestPath;
-  List<int> visitedIndexes;
-  List<int> grid;
-  bool clickedCalculate = false;
-  int timeElapsed;
-  int shortestDistance;
-  List<StreamSubscription> subscriptions = List<StreamSubscription>();
-  double speed = 5;
-  bool unsolvable = false;
 
+  @override
   void initState() {
-    super.initState();
     isSelected[CellAction.add.index] = true;
     resetGrid();
-  }
-
-  void resetSelectedIndexes() {
-    setState(() {
-      selectedIndexes = new Set<int>();
-    });
-  }
-
-  void resetGrid() {
-    grid = List.generate(nRows * nColumns, (i) => 1, growable: false);
-    selectedIndexes = Set<int>();
-    walls = Set<int>();
-    resetOnCalculate();
-  }
-
-  void resetOnCalculate() {
-    setState(() {
-      shortestPath = new List<int>();
-      clickedCalculate = false;
-      visitedIndexes = List<int>();
-      shortestDistance = null;
-      unsolvable = false;
-      timeElapsed = null;
-    });
-    subscriptions.forEach((subscription) {
-      subscription.cancel();
-    });
-  }
-
-  void increaseSelectedIndexes(int amount) {
-    setState(() {
-      selectedIndexes.forEach((index) {
-        grid[index] += amount;
-        if (grid[index] < 0) {
-          grid[index] = 0;
-        }
-      });
-    });
-    if (clickedCalculate) calculate();
-  }
-
-  void toggleWalls(bool add) {
-    setState(() {
-      selectedIndexes.forEach((index) {
-        add ? walls.add(index) : walls.remove(index);
-      });
-      selectedIndexes = new Set<int>();
-    });
-    if (clickedCalculate) calculate();
-  }
-
-  void calculate({animated: true}) {
-    resetOnCalculate();
-    final stopwatch = Stopwatch()..start();
-    WeightedAlgorithm algorithmResult =
-        algorithm.run(grid, walls, nColumns, start, end);
-    setState(() {
-      clickedCalculate = true;
-      shortestDistance = 0;
-      timeElapsed = stopwatch.elapsedMicroseconds;
-    });
-    List<int> steps = algorithmResult.getVisitedIndexes();
-    List<int> shortestPathIndexes = algorithmResult.getShortestPath();
-    for (int i = 0; i < steps.length; i++) {
-      addSubscription(((500 * i) / speed).round(), () {
-        visitedIndexes.add(steps[i]);
-        if (shortestPathIndexes != null &&
-            shortestPathIndexes.contains(steps[i])) {
-          shortestDistance += algorithm.weighted ? grid[steps[i]] : 1;
-        }
-      }, animated);
-    }
-    if (algorithmResult.getDistance() != -1) {
-      if (shortestPathIndexes != null) {
-        shortestPath.length = shortestPathIndexes.length;
-        for (int i = 0; i < shortestPathIndexes.length; i++) {
-          addSubscription(((500 * steps.length + 500 * i) / speed).round(), () {
-            shortestPath[i] = shortestPathIndexes[i];
-          }, animated);
-        }
-      }
-    } else {
-      addSubscription(((500 * steps.length) / speed).round(),
-          () => unsolvable = true, animated);
-    }
-  }
-
-  void addSubscription(int milliseconds, Function stateCallback, animated) {
-    animated
-        ? subscriptions.add(Future.delayed(Duration(milliseconds: milliseconds))
-            .asStream()
-            .listen((e) {
-            setState(stateCallback);
-          }))
-        : stateCallback();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    YoutubePlayerController _controller = YoutubePlayerController(
-      initialVideoId: algorithm.tutorial,
-      flags: YoutubePlayerFlags(
-        autoPlay: true
-      ),
-    );
+    ScreenArguments args = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pathfinding algorithms'),
+        title: Text('Try it yourself'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,49 +56,9 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                algorithm.label,
-                                style: Theme.of(context).textTheme.headline5,
-                              ),
-                              GestureDetector(
-                                child: Text(
-                                  'Tutorial',
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    child: SimpleDialog(
-                                      contentPadding: EdgeInsets.zero,
-                                      titlePadding: EdgeInsets.zero,
-                                      children: <Widget>[
-                                        YoutubePlayer(
-                                          controller: _controller,
-                                          onEnded: (e) {
-                                            _controller.reset();
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
                           Text(
-                            algorithm.description,
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1
-                                .copyWith(color: Colors.grey),
-                            textAlign: TextAlign.justify,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
+                            args.algorithm.label,
+                            style: Theme.of(context).textTheme.headline5,
                           ),
                           Row(
                             children: <Widget>[
@@ -230,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                               Expanded(
                                 child: RaisedButton(
                                   child: Text('Calculate'),
-                                  onPressed: calculate,
+                                  onPressed: () => calculate(args.algorithm),
                                   color: Theme.of(context).buttonColor,
                                 ),
                               ),
@@ -331,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 10.0),
                 Grid(
-                  grid: algorithm.weighted
+                  grid: args.algorithm.weighted
                       ? grid
                       : List.generate(grid.length, (i) => -1),
                   start: start,
@@ -360,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                           walls.remove(i);
                           break;
                       }
-                      if (clickedCalculate) calculate(animated: false);
+                      if (clickedCalculate) calculate(args.algorithm, animated: false);
                     });
                   },
                   visitedIndexes: visitedIndexes,
@@ -371,15 +226,85 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      drawer: SideMenu(
-        onTapMenuItem: (index) {
-          setState(() {
-            algorithm = PathfindingAlgorithm.values[index];
-          });
-          resetOnCalculate();
-          Navigator.pop(context);
-        }
-      ),
     );
   }
+
+  void calculate(PathfindingAlgorithm algorithm, {animated: true}) {
+    resetOnCalculate();
+    final stopwatch = Stopwatch()..start();
+    WeightedAlgorithm algorithmResult =
+        algorithm.run(grid, walls, nColumns, start, end);
+    setState(() {
+      clickedCalculate = true;
+      shortestDistance = 0;
+      timeElapsed = stopwatch.elapsedMicroseconds;
+    });
+    List<int> steps = algorithmResult.getVisitedIndexes();
+    List<int> shortestPathIndexes = algorithmResult.getShortestPath();
+    for (int i = 0; i < steps.length; i++) {
+      addSubscription(((500 * i) / speed).round(), () {
+        visitedIndexes.add(steps[i]);
+        if (shortestPathIndexes != null &&
+            shortestPathIndexes.contains(steps[i])) {
+          shortestDistance += algorithm.weighted ? grid[steps[i]] : 1;
+        }
+      }, animated);
+    }
+    if (algorithmResult.getDistance() != -1) {
+      if (shortestPathIndexes != null) {
+        shortestPath.length = shortestPathIndexes.length;
+        for (int i = 0; i < shortestPathIndexes.length; i++) {
+          addSubscription(((500 * steps.length + 500 * i) / speed).round(), () {
+            shortestPath[i] = shortestPathIndexes[i];
+          }, animated);
+        }
+      }
+    } else {
+      addSubscription(((500 * steps.length) / speed).round(),
+          () => unsolvable = true, animated);
+    }
+  }
+
+  void resetGrid() {
+    grid = List.generate(nRows * nColumns, (i) => 1, growable: false);
+    selectedIndexes = Set<int>();
+    walls = Set<int>();
+    resetOnCalculate();
+  }
+
+  void resetOnCalculate() {
+    subscriptions.forEach((subscription) {
+      subscription.cancel();
+    });
+    setState(() {
+      shortestPath = new List<int>();
+      clickedCalculate = false;
+      visitedIndexes = List<int>();
+      shortestDistance = null;
+      unsolvable = false;
+      timeElapsed = null;
+    });
+  }
+
+  void resetSelectedIndexes() {
+    setState(() {
+      selectedIndexes = new Set<int>();
+    });
+  }
+
+  void addSubscription(int milliseconds, Function stateCallback, animated) {
+    animated
+        ? subscriptions.add(Future.delayed(Duration(milliseconds: milliseconds))
+            .asStream()
+            .listen((e) {
+            setState(stateCallback);
+          }))
+        : stateCallback();
+  }
+}
+
+class ScreenArguments {
+  PathfindingAlgorithm algorithm;
+
+  ScreenArguments(this.algorithm);
 }

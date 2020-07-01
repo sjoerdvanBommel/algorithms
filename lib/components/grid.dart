@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:pathfinder/components/cell.dart';
-import 'package:pathfinder/enums/cell_type.dart';
+import 'package:algorithms/components/cell.dart';
+import 'package:algorithms/enums/cell_type.dart';
 
 class Grid extends StatefulWidget {
   final List<int> grid, shortestPath, visitedIndexes;

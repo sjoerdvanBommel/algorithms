@@ -1,8 +1,8 @@
-import 'package:pathfinder/pathfinders/astar_algorithm.dart';
-import 'package:pathfinder/pathfinders/depth_first_search_algorithm.dart';
-import 'package:pathfinder/pathfinders/dijkstra_algorithm.dart';
-import 'package:pathfinder/pathfinders/breadth_first_search_algorithm.dart';
-import 'package:pathfinder/pathfinders/weighted_algorithm.dart';
+import 'package:algorithms/pathfinders/astar_algorithm.dart';
+import 'package:algorithms/pathfinders/depth_first_search_algorithm.dart';
+import 'package:algorithms/pathfinders/dijkstra_algorithm.dart';
+import 'package:algorithms/pathfinders/breadth_first_search_algorithm.dart';
+import 'package:algorithms/pathfinders/weighted_algorithm.dart';
 
 enum PathfindingAlgorithm {
   dijkstra, astar, breadthFirstSearch, depthFirstSearch
@@ -21,7 +21,7 @@ extension AlgorithmExtension on PathfindingAlgorithm {
   
   String get description {
     switch (this) {
-      case PathfindingAlgorithm.dijkstra: return 'Dijkstra\'s Algorithm guarantees you the shortest path between the start node (you pick which one) and every other node in a graph.';
+      case PathfindingAlgorithm.dijkstra: return 'Dijkstra\'s Algorithm guarantees you the shortest path between the start node (you pick which one by clicking a node) and every other node in a graph.';
       case PathfindingAlgorithm.astar: return 'A* Search algorithm won\'t guarantee the shortest path, but the calculation time is very short because it knows where the end node is.';
       case PathfindingAlgorithm.breadthFirstSearch: return 'Breadth-first search (BFS) starts at the root node and explores all of the neighbor nodes prior to moving on to the next depth level.';
       case PathfindingAlgorithm.depthFirstSearch: return 'Depth-first search (DFS) starts at the root node and explores as far as possible along each branch before backtracking.';

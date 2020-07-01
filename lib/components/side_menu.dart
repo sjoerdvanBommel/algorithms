@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:pathfinder/enums/pathfinding_algorithm.dart';
-import 'package:pathfinder/enums/sorting_algorithm.dart';
+import 'package:algorithms/enums/pathfinding_algorithm.dart';
+import 'package:algorithms/enums/sorting_algorithm.dart';
 
 class SideMenu extends StatelessWidget {
-  final Function onTapMenuItem;
+  final Function onTapPathfindingAlgorithm;
+  final Function onTapSortingAlgorithm;
 
-  SideMenu({@required this.onTapMenuItem});
+  SideMenu({@required this.onTapPathfindingAlgorithm, @required this.onTapSortingAlgorithm});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class SideMenu extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(PathfindingAlgorithm.values[index].label),
-                    onTap: () => onTapMenuItem(index),
+                    onTap: () => onTapPathfindingAlgorithm(index),
                   );
                 },
               ),
@@ -42,7 +43,7 @@ class SideMenu extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(SortingAlgorithm.values[index].label),
-                    onTap: () => onTapMenuItem(index),
+                    onTap: () => onTapSortingAlgorithm(index),
                   );
                 },
               ),

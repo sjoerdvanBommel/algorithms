@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pathfinder/enums/cell_type.dart';
+import 'package:algorithms/enums/cell_type.dart';
 
 class Cell extends StatefulWidget {
   final bool isSelected;

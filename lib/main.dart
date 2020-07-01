@@ -1,5 +1,6 @@
+import 'package:algorithms/pages/pathfinding_try_page.dart';
 import 'package:flutter/material.dart';
-import 'package:pathfinder/pages/home_page.dart';
+import 'package:algorithms/pages/pathfinding_info_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,7 +22,11 @@ class MyApp extends StatelessWidget {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      initialRoute: PathfindingInfoPage.routeName,
+      routes: {
+        PathfindingInfoPage.routeName: (context) => PathfindingInfoPage(),
+        PathfindingTryPage.routeName: (context) => PathfindingTryPage(),
+      },
     );
   }
 }
