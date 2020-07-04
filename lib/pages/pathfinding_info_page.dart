@@ -1,9 +1,7 @@
 import 'package:algorithms/components/tutorials/DijkstraTutorial.dart';
-import 'package:algorithms/pages/pathfinding_try_page.dart';
 import 'package:flutter/material.dart';
 import 'package:algorithms/components/side_menu.dart';
 import 'package:algorithms/enums/pathfinding_algorithm.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PathfindingInfoPage extends StatefulWidget {
   static const routeName = '/pathfinding/info';
@@ -39,19 +37,6 @@ class _PathfindingInfoPageState extends State<PathfindingInfoPage> {
                         children: <Widget>[
                           DijkstraTutorial(algorithm),
                           SizedBox(height: 10),
-                          // Row(
-                          //   children: <Widget>[
-                          //     Expanded(
-                          //       child: RaisedButton(
-                          //         child: Text('Try it yourself!'),
-                          //         onPressed: () => Navigator.pushNamed(
-                          //             context, PathfindingTryPage.routeName,
-                          //             arguments: ScreenArguments(algorithm)),
-                          //         color: Theme.of(context).buttonColor,
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
                         ],
                       ),
                     ),
