@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 
 class PathfindingTryPage extends StatefulWidget {
   static const routeName = '/pathfinding/try';
+  final PathfindingAlgorithm algorithm;
+
+  PathfindingTryPage(this.algorithm);
 
   @override
   _PathfindingTryPageState createState() => _PathfindingTryPageState();
@@ -34,11 +37,9 @@ class _PathfindingTryPageState extends State<PathfindingTryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenArguments args = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Try it yourself'),
+        title: Text('Pathfinding example'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +58,7 @@ class _PathfindingTryPageState extends State<PathfindingTryPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            args.algorithm.label,
+                            widget.algorithm.label,
                             style: Theme.of(context).textTheme.headline5,
                           ),
                           Row(
@@ -85,7 +86,7 @@ class _PathfindingTryPageState extends State<PathfindingTryPage> {
                               Expanded(
                                 child: RaisedButton(
                                   child: Text('Calculate'),
-                                  onPressed: () => calculate(args.algorithm),
+                                  onPressed: () => calculate(widget.algorithm),
                                   color: Theme.of(context).buttonColor,
                                 ),
                               ),
@@ -186,7 +187,7 @@ class _PathfindingTryPageState extends State<PathfindingTryPage> {
                 ),
                 SizedBox(height: 10.0),
                 Grid(
-                  grid: args.algorithm.weighted
+                  grid: widget.algorithm.weighted
                       ? grid
                       : List.generate(grid.length, (i) => -1),
                   start: start,
@@ -215,7 +216,7 @@ class _PathfindingTryPageState extends State<PathfindingTryPage> {
                           walls.remove(i);
                           break;
                       }
-                      if (clickedCalculate) calculate(args.algorithm, animated: false);
+                      if (clickedCalculate) calculate(widget.algorithm, animated: false);
                     });
                   },
                   visitedIndexes: visitedIndexes,

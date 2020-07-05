@@ -1,21 +1,23 @@
+import 'package:algorithms/components/algorithm_chips.dart';
 import 'package:algorithms/components/tutorials/Node.dart';
 import 'package:algorithms/components/tutorials/NodeConnection.dart';
 import 'package:algorithms/components/tutorials/TutorialStep.dart';
 import 'package:algorithms/enums/pathfinding_algorithm.dart';
+import 'package:algorithms/pages/animations/EnterExitRoute.dart';
 import 'package:algorithms/pages/pathfinding_try_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class DijkstraTutorial extends StatefulWidget {
+class AlgorithmTutorial extends StatefulWidget {
   final PathfindingAlgorithm algorithm;
 
-  DijkstraTutorial(this.algorithm);
+  AlgorithmTutorial(this.algorithm);
 
   @override
-  _DijkstraTutorialState createState() => _DijkstraTutorialState();
+  _AlgorithmTutorialState createState() => _AlgorithmTutorialState();
 }
 
-class _DijkstraTutorialState extends State<DijkstraTutorial> {
+class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
   Node start;
   Node currentNode;
   List<NodeConnection> currentNodeConnections;
@@ -64,17 +66,21 @@ class _DijkstraTutorialState extends State<DijkstraTutorial> {
     nodes.forEach((element) => element.distance = 1 << 32);
   }
 
+  goToTryPage() {
+    Navigator.push(
+      context,
+      SlideRightRoute(page: PathfindingTryPage(widget.algorithm)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    YoutubePlayerController _controller = YoutubePlayerController(
-      initialVideoId: widget.algorithm.tutorial,
-      flags: YoutubePlayerFlags(autoPlay: true),
-    );
-
     TutorialStep tutorialStep = getTutorialStep();
+    //TODO improve ugly inaccurate calculation
     int stepsCount = start == null
         ? 1 << 32
         : 17 + nodes.length * 5 + (['A', 'B', 'F'].contains(start.id) ? 1 : 0);
+    bool implemented = widget.algorithm == PathfindingAlgorithm.dijkstra;
 
     return Column(
       children: <Widget>[
@@ -83,37 +89,24 @@ class _DijkstraTutorialState extends State<DijkstraTutorial> {
           children: <Widget>[
             Text(
               widget.algorithm.label +
-                  ' (step $shownStep' +
-                  (start != null ? '/${stepsCount.toString()}' : '') +
-                  ')',
+                  (implemented
+                      ? ' (step $shownStep' +
+                          (start != null ? '/${stepsCount.toString()}' : '') +
+                          ')'
+                      : ''),
               style: Theme.of(context).textTheme.headline5,
             ),
             GestureDetector(
               child: Text(
-                'Tutorial',
+                'Real example',
                 style: TextStyle(color: Colors.blue),
               ),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  child: SimpleDialog(
-                    contentPadding: EdgeInsets.zero,
-                    titlePadding: EdgeInsets.zero,
-                    children: <Widget>[
-                      YoutubePlayer(
-                        controller: _controller,
-                        onEnded: (e) {
-                          _controller.reset();
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
+              onTap: goToTryPage,
             ),
           ],
         ),
+        SizedBox(height: 2),
+        AlgorithmChips(widget.algorithm),
         SizedBox(height: 10),
         Text(
           widget.algorithm.description,
@@ -126,101 +119,112 @@ class _DijkstraTutorialState extends State<DijkstraTutorial> {
           overflow: TextOverflow.ellipsis,
         ),
         SizedBox(height: 10),
-        Container(
-          height: 250,
-          child: new Stack(
-            children: [
-              ...getNodeConnectionWidgets(tutorialStep),
-              ...getNodeWidgets(tutorialStep),
-            ],
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 50),
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: 5),
-              Text('Visited nodes', style: TextStyle(fontSize: 20)),
-              SizedBox(height: 5),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: nodes.map((node) {
-                    return Container(
-                      height: 40,
-                      width: 40,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      child: Center(
-                          child:
-                              Text(visitedNodes.contains(node) ? node.id : '')),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context).backgroundColor,
-                          border: tutorialStep.visitedNodeSelected == null
-                              ? visitedNodes.contains(node)
-                                  ? Border.all(width: 3, color: Colors.green)
-                                  : null
-                              : tutorialStep.visitedNodeSelected(node)
-                                  ? Border.all(width: 3, color: Colors.red)
-                                  : null),
-                    );
-                  }).toList()),
-            ],
-          ),
-        ),
-        SizedBox(height: 20),
-        Row(
-          children: <Widget>[
-            IconButton(
-              iconSize: 36,
-              icon: Icon(Icons.arrow_left),
-              onPressed: codeStep == 0
-                  ? null
-                  : () {
-                      setState(() {
-                        if (codeStep > 0) {
-                          codeStep -= tutorialStep.backSteps;
-                          shownStep--;
-                          isGoingBack = true;
-                        }
-                        if (tutorialStep.goBack != null) tutorialStep.goBack();
-                      });
-                    },
-            ),
-            Expanded(
-              child: Column(
+        implemented
+            ? Column(
                 children: <Widget>[
-                  shownStep == stepsCount
-                      ? RaisedButton(
-                          child: Text('Try it yourself!'),
-                          onPressed: () => Navigator.pushNamed(
-                              context, PathfindingTryPage.routeName,
-                              arguments: ScreenArguments(widget.algorithm)),
-                          color: Theme.of(context).buttonColor,
-                        )
-                      : Text(
-                          tutorialStep.explanation,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18),
+                  Container(
+                    height: 250,
+                    child: new Stack(
+                      children: [
+                        ...getNodeConnectionWidgets(tutorialStep),
+                        ...getNodeWidgets(tutorialStep),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 50),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(height: 5),
+                        Text('Visited nodes', style: TextStyle(fontSize: 20)),
+                        SizedBox(height: 5),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: nodes.map((node) {
+                              return Container(
+                                height: 40,
+                                width: 40,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                child: Center(
+                                    child: Text(visitedNodes.contains(node)
+                                        ? node.id
+                                        : '')),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(context).backgroundColor,
+                                    border: tutorialStep.visitedNodeSelected ==
+                                            null
+                                        ? visitedNodes.contains(node)
+                                            ? Border.all(
+                                                width: 3, color: Colors.green)
+                                            : null
+                                        : tutorialStep.visitedNodeSelected(node)
+                                            ? Border.all(
+                                                width: 3, color: Colors.red)
+                                            : null),
+                              );
+                            }).toList()),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: <Widget>[
+                      IconButton(
+                        iconSize: 36,
+                        icon: Icon(Icons.arrow_left),
+                        onPressed: codeStep == 0
+                            ? null
+                            : () {
+                                setState(() {
+                                  if (codeStep > 0) {
+                                    codeStep -= tutorialStep.backSteps;
+                                    shownStep--;
+                                    isGoingBack = true;
+                                  }
+                                  if (tutorialStep.goBack != null)
+                                    tutorialStep.goBack();
+                                });
+                              },
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: <Widget>[
+                            shownStep == stepsCount
+                                ? RaisedButton(
+                                    child: Text('Try out a real example!'),
+                                    onPressed: goToTryPage,
+                                    color: Theme.of(context).buttonColor,
+                                  )
+                                : Text(
+                                    tutorialStep.explanation,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                          ],
                         ),
+                      ),
+                      IconButton(
+                        iconSize: 36,
+                        icon: Icon(Icons.arrow_right),
+                        onPressed: shownStep == stepsCount || start == null
+                            ? null
+                            : () {
+                                setState(() {
+                                  codeStep += tutorialStep.forwardSteps;
+                                  shownStep++;
+                                  isGoingBack = false;
+                                });
+                              },
+                      ),
+                    ],
+                  ),
                 ],
-              ),
-            ),
-            IconButton(
-              iconSize: 36,
-              icon: Icon(Icons.arrow_right),
-              onPressed: shownStep == stepsCount || start == null
-                  ? null
-                  : () {
-                      setState(() {
-                        codeStep += tutorialStep.forwardSteps;
-                        shownStep++;
-                        isGoingBack = false;
-                      });
-                    },
-            ),
-          ],
-        )
+              )
+            : Text(
+                'Currently there is no tutorial implemented for this algorithm',
+                style: TextStyle(fontSize: 16, color: Colors.grey)),
       ],
     );
   }
@@ -312,14 +316,14 @@ class _DijkstraTutorialState extends State<DijkstraTutorial> {
       );
     } else if (codeStep == 1) {
       return TutorialStep(
-        explanation: 'From now on, {startId} will be the starting node',
+        explanation: 'From now on, ${start.id} will be the starting node',
         selected: (node) => start == node,
       );
     } else if (codeStep == 2) {
       start.distance = 0;
       return TutorialStep(
         explanation:
-            'The tentative distance to {startId} will be set to 0, since we\'re already there',
+            'The tentative distance to ${start.id} will be set to 0, since we\'re already there',
         distanceSelected: (node) => start == node,
         goBack: () => resetNodes(),
       );
@@ -338,7 +342,7 @@ class _DijkstraTutorialState extends State<DijkstraTutorial> {
     } else if (codeStep == 5) {
       return TutorialStep(
         explanation:
-            'The first step will be comparing the tentative distance between the start node ({startId}) and the connected nodes',
+            'The first step will be comparing the tentative distance between the start node (${start.id}) and the connected nodes',
         connectionSelected: (nc) => isConnectedToNode(nc, start),
         distanceSelected: (node) => haveConnection(node, start),
       );

@@ -1,3 +1,4 @@
+import 'package:algorithms/enums/pathfinding_algorithm.dart';
 import 'package:algorithms/pages/pathfinding_try_page.dart';
 import 'package:flutter/material.dart';
 import 'package:algorithms/pages/pathfinding_info_page.dart';
@@ -20,12 +21,14 @@ class MyApp extends StatelessWidget {
         buttonTheme: ButtonThemeData(
           textTheme: ButtonTextTheme.primary,
         ),
+        textTheme: Theme.of(context).textTheme.copyWith(headline4: TextStyle(fontSize: 30, color: Colors.black)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: PathfindingInfoPage.routeName,
       routes: {
         PathfindingInfoPage.routeName: (context) => PathfindingInfoPage(),
-        PathfindingTryPage.routeName: (context) => PathfindingTryPage(),
+        PathfindingTryPage.routeName: (context) =>
+            PathfindingTryPage(PathfindingAlgorithm.dijkstra),
       },
     );
   }
