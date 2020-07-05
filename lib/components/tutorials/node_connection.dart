@@ -1,5 +1,5 @@
-import 'package:algorithms/components/tutorials/Node.dart';
-import 'package:algorithms/components/tutorials/TutorialStep.dart';
+import 'package:algorithms/components/tutorials/node.dart';
+import 'package:algorithms/components/tutorials/tutorial_step.dart';
 import 'package:flutter/material.dart';
 
 class NodeConnection {

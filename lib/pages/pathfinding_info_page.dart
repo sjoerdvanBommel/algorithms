@@ -1,7 +1,4 @@
-import 'package:algorithms/components/algorithm_chips.dart';
-import 'package:algorithms/components/my_chip.dart';
-import 'package:algorithms/components/tutorials/AlgorithmTutorial.dart';
-import 'package:algorithms/enums/chip_label.dart';
+import 'package:algorithms/components/tutorials/algorithm_tutorial.dart';
 import 'package:flutter/material.dart';
 import 'package:algorithms/components/side_menu.dart';
 import 'package:algorithms/enums/pathfinding_algorithm.dart';

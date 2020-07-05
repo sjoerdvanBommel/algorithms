@@ -1,5 +1,5 @@
-import 'package:algorithms/components/tutorials/Node.dart';
-import 'package:algorithms/components/tutorials/NodeConnection.dart';
+import 'package:algorithms/components/tutorials/node.dart';
+import 'package:algorithms/components/tutorials/node_connection.dart';
 
 class TutorialStep {
   String explanation;
