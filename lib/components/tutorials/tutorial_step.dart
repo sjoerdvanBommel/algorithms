@@ -3,12 +3,16 @@ import 'package:algorithms/components/tutorials/node_connection.dart';
 
 class TutorialStep {
   String explanation;
-  int forwardSteps, backSteps;
+  TutorialStep previousStep, nextStep;
+  int backSteps, forwardSteps;
   bool Function(Node node) selected;
   bool Function(Node node) distanceSelected;
   bool Function(Node node) visitedNodeSelected;
   bool Function(NodeConnection connection) connectionSelected;
-  void Function() goBack;
+  List<Node> Function() nodes;
+  List<Node> Function() previousNodes;
+  Set<Node> Function() visitedNodes;
+  Set<Node> Function() previousVisitedNodes;
 
   TutorialStep(
       {this.explanation,
@@ -16,7 +20,14 @@ class TutorialStep {
       this.visitedNodeSelected,
       this.distanceSelected,
       this.connectionSelected,
-      this.goBack,
-      this.forwardSteps: 1,
-      this.backSteps: 1});
+      this.nodes,
+      this.previousNodes,
+      this.previousStep,
+      this.nextStep,
+      this.backSteps: 1,
+      this.forwardSteps: 1});
+
+  bool operator ==(step) => step is TutorialStep && step.explanation == explanation;
+
+  int get hashCode => explanation.hashCode;
 }

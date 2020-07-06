@@ -8,6 +8,8 @@ class NodeConnection {
 
   NodeConnection(this.nodes, this.weight);
 
+  NodeConnection.clone(NodeConnection nc) : this(nc.nodes, nc.weight);
+
   bool operator ==(nodeConnection) =>
       nodeConnection is NodeConnection &&
       this.nodes[0].id == nodeConnection.nodes[0].id &&

@@ -12,17 +12,22 @@ class Node {
     this.distance = distance;
   }
 
+  Node.clone(Node node)
+      : this(
+            id: node.id,
+            left: node.left,
+            top: node.top,
+            distance: node.distance);
+
   int get distance {
     return distances.last;
   }
 
   set distance(int value) {
     distances.addLast(value);
-    distances.forEach((element) {print(element);});
   }
 
-  bool operator ==(node) =>
-      node is Node && node.id == id && node.distance == distance;
+  bool operator ==(node) => node is Node && node.id == id;
 
   int get hashCode => id.hashCode * distance.hashCode;
 }
@@ -57,7 +62,11 @@ class NodeWidget extends StatelessWidget {
                 child: Text(node.id),
                 padding: EdgeInsets.all(15.0),
                 shape: CircleBorder(
-                  side: isSelected || isVisited ? BorderSide(color: isSelected ? Colors.red : Colors.green, width: 3) : BorderSide.none,
+                  side: isSelected || isVisited
+                      ? BorderSide(
+                          color: isSelected ? Colors.red : Colors.green,
+                          width: 3)
+                      : BorderSide.none,
                 ),
               ),
             ),
@@ -75,7 +84,13 @@ class NodeWidget extends StatelessWidget {
                         : Text(node.distance.toString())),
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: isDistanceSelected ? Colors.red : isVisited ? Colors.green : Theme.of(context).accentColor, width: 3),
+                    border: Border.all(
+                        color: isDistanceSelected
+                            ? Colors.red
+                            : isVisited
+                                ? Colors.green
+                                : Theme.of(context).accentColor,
+                        width: 3),
                     color: Theme.of(context).accentColor),
               ),
             ),

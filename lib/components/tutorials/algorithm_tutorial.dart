@@ -20,7 +20,11 @@ class AlgorithmTutorial extends StatefulWidget {
 
 class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
   DijkstraTutorialSteps tutorialSteps;
-  int codeStep = 0, shownStep = 1;
+  TutorialStep currentStep;
+  List<Node> nodes;
+  Set<Node> visitedNodes = new Set<Node>();
+  List<NodeConnection> nodeConnections;
+  int shownStep = 1;
   bool isGoingBack = false;
 
   @override
@@ -31,9 +35,9 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
     Node d = Node(id: 'D', left: 180, top: 20, distance: 1 << 32);
     Node e = Node(id: 'E', left: 180, top: 180, distance: 1 << 32);
     Node f = Node(id: 'F', left: 270, top: 100, distance: 1 << 32);
-    Set<Node> nodes = Set.from([a, b, c, d, e, f]);
+    nodes = [a, b, c, d, e, f];
 
-    Set<NodeConnection> nodeConnections = Set.from([
+    nodeConnections = [
       NodeConnection([a, b], 1),
       NodeConnection([a, c], 4),
       NodeConnection([b, c], 2),
@@ -43,18 +47,19 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
       NodeConnection([d, e], 1),
       NodeConnection([d, f], 2),
       NodeConnection([e, f], 4),
-    ]);
+    ];
     tutorialSteps = DijkstraTutorialSteps(nodeConnections, nodes);
+    currentStep = tutorialSteps.getFirstStep();
 
     super.initState();
   }
 
   setStart(Node node) {
-    if (codeStep == 0) {
+    if (currentStep == tutorialSteps.getFirstStep()) {
       setState(() {
-        tutorialSteps.start = node;
-        tutorialSteps.currentNode = node;
-        codeStep++;
+        tutorialSteps.currentNode =
+            tutorialSteps.nodes.firstWhere((e) => e == node);
+        currentStep = tutorialSteps.getStepAfterSelectingStartNode();
         shownStep++;
       });
     }
@@ -69,11 +74,13 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
 
   @override
   Widget build(BuildContext context) {
-    TutorialStep tutorialStep = tutorialSteps.getTutorialStep(codeStep);
     //TODO improve ugly inaccurate calculation
-    int stepsCount = tutorialSteps.start == null
-        ? 1 << 32
-        : 17 + tutorialSteps.nodes.length * 5 + (['A', 'B', 'F'].contains(tutorialSteps.start.id) ? 1 : 0);
+    int stepsCount = 47;
+    // int stepsCount = tutorialSteps.currentNode == null
+    //     ? 1 << 32
+    //     : 17 +
+    //         nodes.length * 5 +
+    //         (['A', 'B', 'F'].contains(tutorialSteps.currentNode.id) ? 1 : 0);
     bool implemented = widget.algorithm == PathfindingAlgorithm.dijkstra;
 
     return Column(
@@ -85,7 +92,9 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
               widget.algorithm.label +
                   (implemented
                       ? ' (step $shownStep' +
-                          (tutorialSteps.start != null ? '/${stepsCount.toString()}' : '') +
+                          (tutorialSteps.currentNode != null
+                              ? '/${stepsCount.toString()}'
+                              : '') +
                           ')'
                       : ''),
               style: Theme.of(context).textTheme.headline5,
@@ -120,8 +129,8 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
                     height: 250,
                     child: new Stack(
                       children: [
-                        ...getNodeConnectionWidgets(tutorialStep),
-                        ...getNodeWidgets(tutorialSteps.visitedNodes, tutorialStep),
+                        ...getNodeConnectionWidgets(currentStep),
+                        ...getNodeWidgets(visitedNodes, currentStep),
                       ],
                     ),
                   ),
@@ -134,26 +143,26 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
                         SizedBox(height: 5),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: tutorialSteps.nodes.map((node) {
+                            children: nodes.map((node) {
                               return Container(
                                 height: 40,
                                 width: 40,
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 10),
                                 child: Center(
-                                    child: Text(tutorialSteps.visitedNodes.contains(node)
+                                    child: Text(visitedNodes.contains(node)
                                         ? node.id
                                         : '')),
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Theme.of(context).backgroundColor,
-                                    border: tutorialStep.visitedNodeSelected ==
+                                    border: currentStep.visitedNodeSelected ==
                                             null
-                                        ? tutorialSteps.visitedNodes.contains(node)
+                                        ? visitedNodes.contains(node)
                                             ? Border.all(
                                                 width: 3, color: Colors.green)
                                             : null
-                                        : tutorialStep.visitedNodeSelected(node)
+                                        : currentStep.visitedNodeSelected(node)
                                             ? Border.all(
                                                 width: 3, color: Colors.red)
                                             : null),
@@ -168,19 +177,9 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
                       IconButton(
                         iconSize: 36,
                         icon: Icon(Icons.arrow_left),
-                        onPressed: codeStep == 0
+                        onPressed: shownStep <= 1
                             ? null
-                            : () {
-                                setState(() {
-                                  if (codeStep > 0) {
-                                    codeStep -= tutorialStep.backSteps;
-                                    shownStep--;
-                                    isGoingBack = true;
-                                  }
-                                  if (tutorialStep.goBack != null)
-                                    tutorialStep.goBack();
-                                });
-                              },
+                            : () => changeStep(next: false),
                       ),
                       Expanded(
                         child: Column(
@@ -192,7 +191,7 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
                                     color: Theme.of(context).buttonColor,
                                   )
                                 : Text(
-                                    tutorialStep.explanation,
+                                    currentStep.explanation,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontSize: 18),
                                   ),
@@ -202,15 +201,8 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
                       IconButton(
                         iconSize: 36,
                         icon: Icon(Icons.arrow_right),
-                        onPressed: shownStep == stepsCount || tutorialSteps.start == null
-                            ? null
-                            : () {
-                                setState(() {
-                                  codeStep += tutorialStep.forwardSteps;
-                                  shownStep++;
-                                  isGoingBack = false;
-                                });
-                              },
+                        onPressed:
+                            currentStep.nextStep == null ? null : changeStep,
                       ),
                     ],
                   ),
@@ -223,8 +215,29 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
     );
   }
 
+  changeStep({bool next: true}) {
+    setState(() {
+      if (next) {
+        currentStep = currentStep.nextStep;
+        if (currentStep.nodes != null) nodes = currentStep.nodes();
+        if (currentStep.visitedNodes != null)
+          visitedNodes = nodes
+              .where((e) => currentStep.visitedNodes().contains(e))
+              .toSet();
+      } else {
+        if (currentStep.previousNodes != null)
+          nodes = currentStep.previousNodes();
+        if (currentStep.previousVisitedNodes != null)
+          visitedNodes = currentStep.previousVisitedNodes();
+        currentStep = currentStep.previousStep;
+      }
+      shownStep += next ? 1 : -1;
+      isGoingBack = !next;
+    });
+  }
+
   List<NodeConnectionWidget> getNodeConnectionWidgets(TutorialStep step) {
-    return tutorialSteps.nodeConnections
+    return nodeConnections
         .map((nodeConnection) => NodeConnectionWidget(
               nodeConnection: nodeConnection,
               step: step,
@@ -233,13 +246,11 @@ class _AlgorithmTutorialState extends State<AlgorithmTutorial> {
   }
 
   List<NodeWidget> getNodeWidgets(Set<Node> visitedNodes, TutorialStep step) {
-    return tutorialSteps.nodes
+    return nodes
         .map((node) => NodeWidget(
             node: node,
             onPress: (node) => setStart(node),
-            isSelected: step != null && step.selected != null
-                ? step.selected(node)
-                : false,
+            isSelected: step?.selected != null ? step.selected(node) : false,
             isVisited: visitedNodes.contains(node),
             isDistanceSelected: step != null && step.distanceSelected != null
                 ? step.distanceSelected(node)
