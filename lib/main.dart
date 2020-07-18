@@ -1,10 +1,19 @@
-import 'package:algorithms/enums/pathfinding_algorithm.dart';
-import 'package:algorithms/pages/pathfinding_try_page.dart';
+import 'package:algorithms/algorithms/enums/pathfinding_algorithm.dart';
+import 'package:algorithms/home_page.dart';
+import 'package:algorithms/algorithms/pages/pathfinding_try_page.dart';
+import 'package:algorithms/my_diary/pages/my_diary_page.dart';
+import 'package:algorithms/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:algorithms/pages/pathfinding_info_page.dart';
+import 'package:algorithms/algorithms/pages/info_page.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider<ThemeModel>(
+      create: (BuildContext context) => ThemeModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,22 +22,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Algorithms',
-      theme: ThemeData(
-        primaryColor: Colors.blue[700],
-        buttonColor: Colors.blue[700],
-        accentColor: Colors.blue[200],
-        backgroundColor: Colors.blue[50],
-        buttonTheme: ButtonThemeData(
-          textTheme: ButtonTextTheme.primary,
-        ),
-        textTheme: Theme.of(context).textTheme.copyWith(headline4: TextStyle(fontSize: 30, color: Colors.black)),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: PathfindingInfoPage.routeName,
+      theme: Provider.of<ThemeModel>(context).currentTheme,
+      initialRoute: HomePage.routeName,
       routes: {
-        PathfindingInfoPage.routeName: (context) => PathfindingInfoPage(),
+        HomePage.routeName: (context) => HomePage(),
+
+        // Algorithms
+        InfoPage.routeName: (context) => InfoPage(),
         PathfindingTryPage.routeName: (context) =>
             PathfindingTryPage(PathfindingAlgorithm.dijkstra),
+
+        // My Diary
+        MyDiaryPage.routeName: (context) => MyDiaryPage(),
       },
     );
   }
