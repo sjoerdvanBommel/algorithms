@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:algorithms/my_diary/functions/drag_functions.dart';
 import 'package:flutter/material.dart';
 
 class FlipDrawer extends StatefulWidget {
@@ -43,7 +44,8 @@ class _FlipDrawerState extends State<FlipDrawer>
     return GestureDetector(
       onHorizontalDragStart: _onDragStart,
       onHorizontalDragUpdate: _onDragUpdate,
-      onHorizontalDragEnd: _onDragEnd,
+      onHorizontalDragEnd: (details) =>
+          onHorizontalDragEnd(animationController, details, context, true, .5),
       behavior: HitTestBehavior.translucent,
       child: AnimatedBuilder(
         animation: animationController,
@@ -78,7 +80,7 @@ class _FlipDrawerState extends State<FlipDrawer>
                     padding: EdgeInsets.zero,
                     minWidth: 40,
                     child: IconTheme(
-                      data: Theme.of(context).primaryIconTheme,
+                      data: Theme.of(context).accentIconTheme,
                       child: Icon(
                         Icons.sort,
                         size: 40,
@@ -105,23 +107,6 @@ class _FlipDrawerState extends State<FlipDrawer>
     if (_canBeDragged) {
       double delta = details.primaryDelta / maxSlide;
       animationController.value += delta;
-    }
-  }
-
-  void _onDragEnd(DragEndDetails details) {
-    double _kMinFlingVelocity = 365.0;
-    if (animationController.isDismissed || animationController.isCompleted) {
-      return;
-    }
-    if (details.velocity.pixelsPerSecond.dx.abs() >= _kMinFlingVelocity) {
-      double visualVelocity = details.velocity.pixelsPerSecond.dx /
-          MediaQuery.of(context).size.width;
-
-      animationController.fling(velocity: visualVelocity);
-    } else if (animationController.value < 0.5) {
-      animationController.reverse();
-    } else {
-      animationController.forward();
     }
   }
 }

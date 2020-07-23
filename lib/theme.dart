@@ -20,18 +20,21 @@ extension ThemeTypeData on ThemeType {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         );
       case ThemeType.MyDiary:
-        return ThemeData.light().copyWith(
+        ThemeData light = ThemeData.light();
+        return light.copyWith(
           backgroundColor: Color(0xFFFCFCFC),
-          primaryIconTheme: IconThemeData(color: Colors.grey[800]),
-          textTheme: TextTheme(
-              bodyText1: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.grey[800],
-              ),
-              button: TextStyle(
-                color: Colors.grey[500],
-              )),
+          accentColor: Colors.amber[100],
+          accentIconTheme: IconThemeData(color: Colors.grey[800]),
+          textTheme: light.textTheme.copyWith(
+            bodyText1: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.grey[800],
+            ),
+            button: TextStyle(
+              color: Colors.grey[500],
+            ),
+          ),
         );
     }
   }
